@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Eye, Palette, Target, Grid3X3, Zap, Clock } from 'lucide-react-native';
+import { Eye, Palette, Target, Grid3X3, Zap, Clock, BookOpen } from 'lucide-react-native';
 import { router } from 'expo-router';
 
 const diagnosticTests = [
@@ -49,6 +49,33 @@ const diagnosticTests = [
     color: '#8B5CF6',
     duration: '3-5 min',
     route: '/tests/contrast-sensitivity',
+  },
+  {
+    id: 'visual-field',
+    title: 'Visual Field Test',
+    description: 'Screen for peripheral vision and glaucoma risk',
+    icon: Target,
+    color: '#8B5CF6',
+    duration: '5-7 min',
+    route: '/tests/visual-field',
+  },
+  {
+    id: 'pupil-response',
+    title: 'Pupil Response Test',
+    description: 'Experimental neurological screening (camera required)',
+    icon: Eye,
+    color: '#EF4444',
+    duration: '2-3 min',
+    route: '/tests/pupil-response',
+  },
+  {
+    id: 'reading-speed',
+    title: 'Reading Speed Test',
+    description: 'Assess reading performance and visual processing',
+    icon: BookOpen,
+    color: '#0EA5E9',
+    duration: '4-6 min',
+    route: '/tests/reading-speed',
   },
 ];
 
