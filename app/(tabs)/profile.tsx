@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, Switch, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { User, Settings, Bell, Shield, HelpCircle, LogOut, Calendar, Eye } from 'lucide-react-native';
+import { User, Settings, Bell, Shield, HelpCircle, LogOut, Calendar, Eye, AlertTriangle } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router } from 'expo-router';
 
 interface UserProfile {
   name: string;
@@ -69,6 +70,14 @@ export default function ProfileScreen() {
         }},
       ]
     );
+  };
+
+  const handleSettingsPress = () => {
+    router.push('/settings');
+  };
+
+  const handleEmergencyPress = () => {
+    router.push('/emergency');
   };
 
   const formatDate = (dateString: string) => {
@@ -160,9 +169,15 @@ export default function ProfileScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Account</Text>
           
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity style={styles.menuItem} onPress={handleSettingsPress}>
             <Settings size={20} color="#6B7280" />
             <Text style={styles.menuLabel}>Account Settings</Text>
+            <Text style={styles.menuArrow}>›</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.menuItem} onPress={handleEmergencyPress}>
+            <AlertTriangle size={20} color="#EF4444" />
+            <Text style={styles.menuLabel}>Emergency Information</Text>
             <Text style={styles.menuArrow}>›</Text>
           </TouchableOpacity>
 
