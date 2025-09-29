@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Eye, Palette, Target, Grid3X3, Zap, Clock, BookOpen } from 'lucide-react-native';
+import { Eye, Palette, Target, Grid3X3, Zap, Clock, BookOpen, AlertTriangle, Settings } from 'lucide-react-native';
 import { router } from 'expo-router';
 
 const diagnosticTests = [
@@ -84,12 +84,28 @@ export default function TestsScreen() {
     router.push(route as any);
   };
 
+  const handleEmergencyPress = () => {
+    router.push('/emergency');
+  };
+
+  const handleSettingsPress = () => {
+    router.push('/settings');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <LinearGradient
         colors={['#3B82F6', '#1D4ED8']}
         style={styles.header}
       >
+        <View style={styles.headerTop}>
+          <TouchableOpacity style={styles.emergencyButton} onPress={handleEmergencyPress}>
+            <AlertTriangle size={20} color="#FFFFFF" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.settingsButton} onPress={handleSettingsPress}>
+            <Settings size={20} color="#FFFFFF" />
+          </TouchableOpacity>
+        </View>
         <Text style={styles.headerTitle}>EyeCare Pro</Text>
         <Text style={styles.headerSubtitle}>Comprehensive Eye Health Screening</Text>
       </LinearGradient>
@@ -155,6 +171,27 @@ const styles = StyleSheet.create({
     paddingVertical: 30,
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
+  },
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  emergencyButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  settingsButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   headerTitle: {
     fontSize: 28,
