@@ -9,7 +9,8 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.hoppng.eyecareprorrrkb5dhodl3mntwye4f"
     },
     "web": {
       "bundler": "metro",
