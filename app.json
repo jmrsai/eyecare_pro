@@ -30,6 +30,9 @@
         "projectId": "0a07f24d-52d0-4155-a469-c1fc2fea11f2"
       }
     },
-    "owner": "hoppng"
+    "owner": "hoppng",
+    "android": {
+      "package": "com.hoppng.eyecareprorrrkb5dhodl3mntwye4f"
+    }
   }
 }
