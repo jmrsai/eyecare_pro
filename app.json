@@ -10,7 +10,10 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.hoppng.eyecareprorrrkb5dhodl3mntwye4f"
+      "bundleIdentifier": "com.hoppng.eyecareprorrrkb5dhodl3mntwye4f",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "web": {
       "bundler": "metro",
