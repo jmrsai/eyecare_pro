@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "bolt-expo-nativewind",
-    "slug": "eyecare-pro-rrrkb5dhod-l3mntwye4f",
+    "name": "EyeCare Pro",
+    "slug": "eyecare-pro",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.hoppng.eyecareprorrrkb5dhodl3mntwye4f",
+      "bundleIdentifier": "com.eyecare.pro",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -36,7 +36,11 @@
     },
     "owner": "hoppng",
     "android": {
-      "package": "com.hoppng.eyecareprorrrkb5dhodl3mntwye4f"
+      "package": "com.eyecare.pro",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "#FFFFFF"
+      }
     }
   }
 }
