@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Animated, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ArrowLeft, Star, Trophy } from 'lucide-react-native';
@@ -14,6 +14,7 @@ export default function CosmicRacerGame() {
   const [lapsCompleted, setLapsCompleted] = useState(0);
   const [raceAnim] = useState(new Animated.Value(0));
   const [starAnim] = useState(new Animated.Value(0));
+  const progressRef = useRef(0);
 
   useEffect(() => {
     if (gamePhase === 'playing') {
@@ -23,7 +24,12 @@ export default function CosmicRacerGame() {
 
   const startRace = () => {
     raceAnim.setValue(0);
-    
+    progressRef.current = 0;
+
+    const listener = raceAnim.addListener(({ value }) => {
+      progressRef.current = value;
+    });
+
     // Create figure-8 animation
     const raceLoop = () => {
       Animated.timing(raceAnim, {
@@ -105,17 +111,17 @@ export default function CosmicRacerGame() {
 
   // Calculate spaceship position along figure-8 path
   const getSpaceshipPosition = () => {
-    const progress = raceAnim._value;
+    const progress = progressRef.current;
     const centerX = width / 2;
     const centerY = height / 2;
     const radiusX = width * 0.3;
     const radiusY = height * 0.15;
-    
+
     // Figure-8 parametric equations
     const t = progress * Math.PI * 4; // Complete figure-8
     const x = centerX + (radiusX * Math.sin(t)) / (1 + Math.cos(t) * Math.cos(t));
     const y = centerY + (radiusY * Math.sin(t) * Math.cos(t)) / (1 + Math.cos(t) * Math.cos(t));
-    
+
     return { x, y };
   };
 
