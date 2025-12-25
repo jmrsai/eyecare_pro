@@ -204,7 +204,7 @@ export default function KidsHomeScreen() {
           <View style={styles.limitCard}>
             <Text style={styles.limitTitle}>🎮 Great Job Today!</Text>
             <Text style={styles.limitText}>
-              You've played for {stats.todayPlayTime} minutes today. 
+              You&apos;ve played for {stats.todayPlayTime} minutes today. 
               Time to rest those amazing eyes! Come back tomorrow for more adventures!
             </Text>
           </View>
@@ -274,7 +274,7 @@ export default function KidsHomeScreen() {
 
         {/* Encouragement Section */}
         <View style={styles.encouragementCard}>
-          <Text style={styles.encouragementTitle}>🌈 You're Amazing!</Text>
+          <Text style={styles.encouragementTitle}>🌈 You&apos;re Amazing!</Text>
           <Text style={styles.encouragementText}>
             Every game you play makes your eyes stronger and healthier. 
             Keep up the fantastic work, {childName}!

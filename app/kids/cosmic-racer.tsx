@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Animated, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ArrowLeft, Star, Trophy } from 'lucide-react-native';
+import { ArrowLeft, Star, Trophy, Play, RotateCcw } from 'lucide-react-native';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useSound } from '../../contexts/SoundContext';
 
 const { width, height } = Dimensions.get('window');
 
 export default function CosmicRacerGame() {
+  const { playSound } = useSound();
   const [gamePhase, setGamePhase] = useState<'intro' | 'playing' | 'complete'>('intro');
   const [score, setScore] = useState(0);
   const [level, setLevel] = useState(1);
@@ -30,28 +32,35 @@ export default function CosmicRacerGame() {
       progressRef.current = value;
     });
 
+    // Speed increases with level: Level 1 = 4000ms, Level 2 = 3000ms, Level 3 = 2000ms
+    const duration = Math.max(1500, 5000 - (level * 1000));
+
     // Create figure-8 animation
     const raceLoop = () => {
       Animated.timing(raceAnim, {
         toValue: 1,
-        duration: 4000 - (level * 200), // Gets faster each level
+        duration: duration,
         useNativeDriver: true,
-      }).start(() => {
-        const newLaps = lapsCompleted + 1;
-        setLapsCompleted(newLaps);
-        setScore(prev => prev + (level * 10));
-        
-        if (newLaps >= 5) {
-          if (level < 3) {
-            setLevel(prev => prev + 1);
-            setLapsCompleted(0);
-            raceLoop(); // Continue to next level
+      }).start(({ finished }) => {
+        if (finished) {
+          const newLaps = lapsCompleted + 1;
+          setLapsCompleted(newLaps);
+          setScore(prev => prev + (level * 10));
+          
+          if (newLaps >= 5) {
+            playSound('success');
+            if (level < 3) {
+              setLevel(prev => prev + 1);
+              setLapsCompleted(0);
+              // Small pause before next level
+              setTimeout(raceLoop, 1000); 
+            } else {
+              completeGame();
+            }
           } else {
-            completeGame();
+            raceAnim.setValue(0);
+            raceLoop(); // Continue racing
           }
-        } else {
-          raceAnim.setValue(0);
-          raceLoop(); // Continue racing
         }
       });
     };
@@ -73,9 +82,15 @@ export default function CosmicRacerGame() {
         }),
       ])
     ).start();
+
+    return () => {
+        raceAnim.removeListener(listener);
+        raceAnim.stopAnimation();
+    };
   };
 
   const completeGame = async () => {
+    playSound('levelUp');
     setGamePhase('complete');
     
     try {
@@ -96,6 +111,7 @@ export default function CosmicRacerGame() {
   };
 
   const startGame = () => {
+    playSound('click');
     setGamePhase('playing');
     setScore(0);
     setLevel(1);
@@ -103,27 +119,28 @@ export default function CosmicRacerGame() {
   };
 
   const resetGame = () => {
+    playSound('click');
     setGamePhase('intro');
     setScore(0);
     setLevel(1);
     setLapsCompleted(0);
   };
 
-  // Calculate spaceship position along figure-8 path
-  const getSpaceshipPosition = () => {
-    const progress = progressRef.current;
-    const centerX = width / 2;
-    const centerY = height / 2;
-    const radiusX = width * 0.3;
-    const radiusY = height * 0.15;
+  // Interpolation for smooth animation
+  const moveX = raceAnim.interpolate({
+    inputRange: [0, 0.25, 0.5, 0.75, 1],
+    outputRange: [width / 2 - 20, width - 60, width / 2 - 20, 20, width / 2 - 20]
+  });
 
-    // Figure-8 parametric equations
-    const t = progress * Math.PI * 4; // Complete figure-8
-    const x = centerX + (radiusX * Math.sin(t)) / (1 + Math.cos(t) * Math.cos(t));
-    const y = centerY + (radiusY * Math.sin(t) * Math.cos(t)) / (1 + Math.cos(t) * Math.cos(t));
+  const moveY = raceAnim.interpolate({
+    inputRange: [0, 0.25, 0.5, 0.75, 1],
+    outputRange: [height / 2 - 20, height / 2 + 80, height / 2 - 20, height / 2 - 120, height / 2 - 20]
+  });
 
-    return { x, y };
-  };
+  const rotateZ = raceAnim.interpolate({
+    inputRange: [0, 0.25, 0.5, 0.75, 1],
+    outputRange: ['0deg', '90deg', '180deg', '270deg', '360deg']
+  });
 
   if (gamePhase === 'complete') {
     return (
@@ -136,7 +153,13 @@ export default function CosmicRacerGame() {
         </LinearGradient>
 
         <View style={styles.completeContainer}>
-          <Text style={styles.completeEmoji}>🏆</Text>
+          <View style={styles.trophyContainer}>
+            <Trophy size={80} color="#FFD700" />
+            <Animated.View style={{position: 'absolute', opacity: starAnim}}>
+                <Star size={40} color="#FFFFFF" style={{top: -20, right: -20}} />
+            </Animated.View>
+          </View>
+          
           <Text style={styles.completeTitle}>Mission Accomplished!</Text>
           <Text style={styles.completeText}>
             Amazing piloting skills! You completed all 3 levels and 15 laps through the cosmic race track!
@@ -158,11 +181,12 @@ export default function CosmicRacerGame() {
 
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.playAgainButton} onPress={resetGame}>
-              <Text style={styles.playAgainText}>🚀 Race Again</Text>
+              <RotateCcw size={24} color="#FFFFFF" />
+              <Text style={styles.playAgainText}>Race Again</Text>
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.doneButton} onPress={() => router.back()}>
-              <Text style={styles.doneText}>🏠 Back to Games</Text>
+              <Text style={styles.doneText}>Back to Games</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -181,10 +205,12 @@ export default function CosmicRacerGame() {
         </LinearGradient>
 
         <View style={styles.introContainer}>
-          <Text style={styles.introEmoji}>🌌</Text>
+          <View style={styles.iconCircle}>
+            <Text style={styles.introEmoji}>🌌</Text>
+          </View>
           <Text style={styles.introTitle}>Welcome, Space Pilot!</Text>
           <Text style={styles.introText}>
-            You're the captain of a super-fast spaceship! Your mission is to follow the cosmic race track 
+            You&apos;re the captain of a super-fast spaceship! Your mission is to follow the cosmic race track 
             through the stars without moving your head. Use only your eyes to track the spaceship!
           </Text>
           
@@ -194,32 +220,36 @@ export default function CosmicRacerGame() {
               • Keep your head perfectly still{'\n'}
               • Follow the spaceship with your eyes only{'\n'}
               • Complete 5 laps to advance to the next level{'\n'}
-              • The spaceship gets faster each level!{'\n'}
-              • Complete all 3 levels to become a Cosmic Champion!
+              • The spaceship gets faster each level!
             </Text>
           </View>
 
           <TouchableOpacity style={styles.startButton} onPress={startGame}>
-            <Text style={styles.startButtonText}>🚀 Launch Mission</Text>
+            <Play size={24} color="#FFFFFF" fill="#FFFFFF" />
+            <Text style={styles.startButtonText}>Launch Mission</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
     );
   }
 
-  const spaceshipPos = getSpaceshipPosition();
-
   return (
     <SafeAreaView style={styles.container}>
-      <LinearGradient colors={['#1E1B4B', '#312E81']} style={styles.gameHeader}>
+      <LinearGradient colors={['#0F172A', '#1E1B4B', '#312E81']} style={styles.gameHeader}>
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <ArrowLeft size={20} color="#FFFFFF" />
         </TouchableOpacity>
         
         <View style={styles.gameStats}>
-          <Text style={styles.statText}>⭐ {score} points</Text>
-          <Text style={styles.statText}>🏁 Level {level}</Text>
-          <Text style={styles.statText}>🔄 {lapsCompleted}/5 laps</Text>
+          <View style={styles.statBadge}>
+            <Text style={styles.statText}>⭐ {score}</Text>
+          </View>
+          <View style={styles.statBadge}>
+            <Text style={styles.statText}>🏁 Lvl {level}</Text>
+          </View>
+          <View style={styles.statBadge}>
+            <Text style={styles.statText}>🔄 {lapsCompleted}/5</Text>
+          </View>
         </View>
       </LinearGradient>
 
@@ -234,34 +264,34 @@ export default function CosmicRacerGame() {
           <Text style={[styles.star, { top: '70%', right: '60%' }]}>🌟</Text>
         </Animated.View>
 
-        {/* Race track outline (figure-8) */}
-        <View style={styles.trackContainer}>
-          <View style={styles.trackOutline} />
-        </View>
-
         {/* Animated spaceship */}
         <Animated.View
           style={[
             styles.spaceship,
             {
-              left: spaceshipPos.x - 20,
-              top: spaceshipPos.y - 20,
+              transform: [
+                { translateX: moveX },
+                { translateY: moveY },
+                { rotate: rotateZ }
+              ]
             }
           ]}
         >
-          <Text style={styles.spaceshipEmoji}>🚀</Text>
+          <View style={styles.spaceshipInner}>
+            <Text style={styles.spaceshipEmoji}>🚀</Text>
+          </View>
         </Animated.View>
 
         {/* Instruction bubble */}
         <View style={styles.instructionBubble}>
           <Text style={styles.instructionText}>
-            🎯 Follow the spaceship with your eyes! Keep your head still and track smoothly.
+            🎯 Follow the spaceship with your eyes!
           </Text>
         </View>
 
         {/* Level progress */}
         <View style={styles.progressContainer}>
-          <Text style={styles.progressText}>Level {level} - Speed: {level === 1 ? 'Slow' : level === 2 ? 'Medium' : 'Fast'}</Text>
+          <Text style={styles.progressText}>Speed: {level === 1 ? 'Normal' : level === 2 ? 'Fast' : 'Hyper'}</Text>
           <View style={styles.progressBar}>
             <View style={[styles.progressFill, { width: `${(lapsCompleted / 5) * 100}%` }]} />
           </View>
@@ -286,9 +316,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingVertical: 20,
+    paddingTop: 40,
+    paddingBottom: 20,
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
+    zIndex: 10,
   },
   backButton: {
     width: 40,
@@ -308,12 +340,18 @@ const styles = StyleSheet.create({
   gameStats: {
     flex: 1,
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginLeft: 20,
+    justifyContent: 'flex-end',
+    gap: 8,
+  },
+  statBadge: {
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 12,
   },
   statText: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 14,
+    fontWeight: '700',
     color: '#FFFFFF',
   },
   introContainer: {
@@ -322,9 +360,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 30,
   },
+  iconCircle: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+    borderWidth: 2,
+    borderColor: '#3B82F6',
+  },
   introEmoji: {
-    fontSize: 80,
-    marginBottom: 20,
+    fontSize: 60,
   },
   introTitle: {
     fontSize: 28,
@@ -347,6 +395,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)',
+    width: '100%',
   },
   instructionsTitle: {
     fontSize: 18,
@@ -357,7 +406,7 @@ const styles = StyleSheet.create({
   instructionText: {
     fontSize: 14,
     color: '#C7D2FE',
-    lineHeight: 20,
+    lineHeight: 22,
   },
   startButton: {
     backgroundColor: '#3B82F6',
@@ -369,6 +418,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   startButtonText: {
     fontSize: 18,
@@ -377,7 +429,11 @@ const styles = StyleSheet.create({
   },
   gameArea: {
     flex: 1,
-    position: 'relative',
+    position: 'absolute', // Make it fill screen
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   starsContainer: {
     position: 'absolute',
@@ -390,42 +446,43 @@ const styles = StyleSheet.create({
     position: 'absolute',
     fontSize: 20,
   },
-  trackContainer: {
-    position: 'absolute',
-    top: '20%',
-    left: '10%',
-    right: '10%',
-    bottom: '30%',
-  },
-  trackOutline: {
-    flex: 1,
-    borderWidth: 2,
-    borderColor: 'rgba(59, 130, 246, 0.3)',
-    borderRadius: 100,
-    borderStyle: 'dashed',
-  },
   spaceship: {
     position: 'absolute',
-    width: 40,
-    height: 40,
+    width: 60,
+    height: 60,
     justifyContent: 'center',
     alignItems: 'center',
+    // Center point logic handled in translation
+    top: 0,
+    left: 0,
+  },
+  spaceshipInner: {
+    width: 50,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(59, 130, 246, 0.3)',
+    borderRadius: 25,
+    borderWidth: 1,
+    borderColor: '#60A5FA',
   },
   spaceshipEmoji: {
-    fontSize: 32,
+    fontSize: 30,
   },
   instructionBubble: {
     position: 'absolute',
     bottom: 120,
-    left: 20,
-    right: 20,
-    backgroundColor: 'rgba(59, 130, 246, 0.9)',
+    alignSelf: 'center',
+    backgroundColor: 'rgba(15, 23, 42, 0.8)',
     borderRadius: 20,
-    padding: 16,
+    padding: 12,
+    paddingHorizontal: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
   },
   progressContainer: {
     position: 'absolute',
-    bottom: 60,
+    bottom: 50,
     left: 20,
     right: 20,
   },
@@ -437,14 +494,15 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   progressBar: {
-    height: 6,
+    height: 8,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 3,
+    borderRadius: 4,
+    overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
     backgroundColor: '#3B82F6',
-    borderRadius: 3,
+    borderRadius: 4,
   },
   completeContainer: {
     flex: 1,
@@ -452,12 +510,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 30,
   },
-  completeEmoji: {
-    fontSize: 80,
+  trophyContainer: {
     marginBottom: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   completeTitle: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#FFFFFF',
     marginBottom: 16,
@@ -478,6 +537,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)',
+    width: '100%',
   },
   scoreItem: {
     alignItems: 'center',
@@ -503,6 +563,9 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingVertical: 16,
     alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
   },
   playAgainText: {
     fontSize: 16,
@@ -510,7 +573,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   doneButton: {
-    backgroundColor: '#6B7280',
+    backgroundColor: 'rgba(255,255,255,0.1)',
     borderRadius: 16,
     paddingVertical: 16,
     alignItems: 'center',
@@ -519,5 +582,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#FFFFFF',
+  },
+  trackContainer: {
+    position: 'absolute',
+    top: '20%',
+    left: '10%',
+    right: '10%',
+    bottom: '30%',
+  },
+  trackOutline: {
+    flex: 1,
+    borderWidth: 2,
+    borderColor: 'rgba(59, 130, 246, 0.3)',
+    borderRadius: 100,
+    borderStyle: 'dashed',
   },
 });

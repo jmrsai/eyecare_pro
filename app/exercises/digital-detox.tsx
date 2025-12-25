@@ -212,7 +212,7 @@ export default function DigitalDetoxExercise() {
           <CheckCircle size={80} color="#10B981" />
           <Text style={styles.completeTitle}>Digital Eye Strain Relief Complete!</Text>
           <Text style={styles.completeText}>
-            Great job! You've completed an 8-minute digital detox session. 
+            Great job! You&apos;ve completed an 8-minute digital detox session. 
             Your eyes should feel more relaxed and refreshed.
           </Text>
           

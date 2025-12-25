@@ -39,7 +39,7 @@ export default function KidsTabScreen() {
         </TouchableOpacity>
 
         <View style={styles.featuresSection}>
-          <Text style={styles.sectionTitle}>What's Inside? 🎮</Text>
+          <Text style={styles.sectionTitle}>What&apos;s Inside? 🎮</Text>
           
           <View style={styles.featureCard}>
             <Text style={styles.featureEmoji}>🦋</Text>

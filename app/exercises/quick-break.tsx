@@ -292,7 +292,7 @@ export default function QuickBreakExercise() {
           <CheckCircle size={80} color="#10B981" />
           <Text style={styles.completeTitle}>Quick Screen Break Complete!</Text>
           <Text style={styles.completeText}>
-            Perfect! You've completed a 2-minute eye refresher. 
+            Perfect! You&apos;ve completed a 2-minute eye refresher. 
             Your eyes are now ready for more screen time.
           </Text>
           

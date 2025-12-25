@@ -164,7 +164,7 @@ export default function ExercisesScreen() {
           </View>
           <Text style={styles.recommendationText}>
             {completedToday 
-              ? "Great job! You've completed your daily eye workout. Consider a quick break session if you're still working."
+              ? <>Great job! You&apos;ve completed your daily eye workout. Consider a quick break session if you&apos;re still working.</>
               : "Start with the 5-Minute Morning Reset to prepare your eyes for the day ahead."
             }
           </Text>

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Animated, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ArrowLeft, Star, Trophy } from 'lucide-react-native';
+import { ArrowLeft, Star, Trophy, Search, RotateCcw } from 'lucide-react-native';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useSound } from '../../contexts/SoundContext';
 
 const { width, height } = Dimensions.get('window');
 
@@ -26,6 +27,7 @@ const ANIMALS = [
 ];
 
 export default function JungleExplorerGame() {
+  const { playSound } = useSound();
   const [currentAnimal, setCurrentAnimal] = useState<Animal | null>(null);
   const [score, setScore] = useState(0);
   const [level, setLevel] = useState(1);
@@ -41,14 +43,24 @@ export default function JungleExplorerGame() {
   }, [gamePhase, currentAnimal]);
 
   const showNextAnimal = () => {
-    if (animalsFound >= 6) {
-      completeGame();
-      return;
+    if (animalsFound >= 5 + (level * 2)) {
+        if (level < 3) {
+            playSound('levelUp');
+            setLevel(prev => prev + 1);
+            setAnimalsFound(0);
+            return;
+        } else {
+            completeGame();
+            return;
+        }
     }
 
-    const animalData = ANIMALS[animalsFound];
+    const animalData = ANIMALS[animalsFound % ANIMALS.length];
     const isNear = Math.random() > 0.5;
     
+    // Harder levels: faster disappearance (not fully implemented to keep it kid-friendly, but logic is here)
+    const timeoutDuration = Math.max(1500, 4000 - (level * 800));
+
     const newAnimal: Animal = {
       id: Date.now().toString(),
       emoji: animalData.emoji,
@@ -70,7 +82,7 @@ export default function JungleExplorerGame() {
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
-        duration: 800,
+        duration: 500, // Faster appear
         useNativeDriver: true,
       }),
       Animated.spring(scaleAnim, {
@@ -80,19 +92,13 @@ export default function JungleExplorerGame() {
         useNativeDriver: true,
       }),
     ]).start();
-
-    // Auto-advance after 3 seconds
-    setTimeout(() => {
-      if (currentAnimal?.id === newAnimal.id) {
-        handleAnimalSpotted();
-      }
-    }, 3000);
   };
 
   const handleAnimalSpotted = () => {
     if (!currentAnimal) return;
 
-    const points = currentAnimal.isNear ? 10 : 15; // Far animals are worth more
+    playSound('success');
+    const points = (currentAnimal.isNear ? 10 : 15) * level;
     setScore(prev => prev + points);
     setAnimalsFound(prev => prev + 1);
     
@@ -100,12 +106,12 @@ export default function JungleExplorerGame() {
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 0,
-        duration: 500,
+        duration: 300,
         useNativeDriver: true,
       }),
       Animated.timing(scaleAnim, {
         toValue: 0.1,
-        duration: 500,
+        duration: 300,
         useNativeDriver: true,
       }),
     ]).start(() => {
@@ -114,16 +120,16 @@ export default function JungleExplorerGame() {
   };
 
   const completeGame = async () => {
+    playSound('levelUp');
     setGamePhase('complete');
     
     try {
-      // Save game stats
       const stats = await AsyncStorage.getItem('kidsStats');
       const currentStats = stats ? JSON.parse(stats) : {};
       
       const updatedStats = {
         ...currentStats,
-        totalStars: (currentStats.totalStars || 0) + Math.floor(score / 10),
+        totalStars: (currentStats.totalStars || 0) + Math.floor(score / 20),
         gamesPlayed: (currentStats.gamesPlayed || 0) + 1,
         todayPlayTime: (currentStats.todayPlayTime || 0) + 5,
       };
@@ -135,15 +141,19 @@ export default function JungleExplorerGame() {
   };
 
   const startGame = () => {
+    playSound('click');
     setGamePhase('playing');
     setScore(0);
+    setLevel(1);
     setAnimalsFound(0);
     setCurrentAnimal(null);
   };
 
   const resetGame = () => {
+    playSound('click');
     setGamePhase('intro');
     setScore(0);
+    setLevel(1);
     setAnimalsFound(0);
     setCurrentAnimal(null);
   };
@@ -162,14 +172,14 @@ export default function JungleExplorerGame() {
           <Text style={styles.completeEmoji}>🏆</Text>
           <Text style={styles.completeTitle}>Jungle Mission Complete!</Text>
           <Text style={styles.completeText}>
-            Wow! You found all {animalsFound} animals in Kambalakonda Sanctuary!
+            Wow! You found all the hidden animals in Kambalakonda Sanctuary!
             Your eyes are getting stronger every day!
           </Text>
           
           <View style={styles.scoreCard}>
             <View style={styles.scoreItem}>
               <Star size={24} color="#FFD700" />
-              <Text style={styles.scoreNumber}>{Math.floor(score / 10)}</Text>
+              <Text style={styles.scoreNumber}>{Math.floor(score / 20)}</Text>
               <Text style={styles.scoreLabel}>Stars Earned</Text>
             </View>
             <View style={styles.scoreItem}>
@@ -181,11 +191,12 @@ export default function JungleExplorerGame() {
 
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.playAgainButton} onPress={resetGame}>
-              <Text style={styles.playAgainText}>🎮 Play Again</Text>
+              <RotateCcw size={24} color="#FFFFFF" />
+              <Text style={styles.playAgainText}>Play Again</Text>
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.doneButton} onPress={() => router.back()}>
-              <Text style={styles.doneText}>🏠 Back to Games</Text>
+              <Text style={styles.doneText}>Back to Games</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -204,10 +215,12 @@ export default function JungleExplorerGame() {
         </LinearGradient>
 
         <View style={styles.introContainer}>
-          <Text style={styles.introEmoji}>🌿</Text>
+          <View style={styles.iconCircle}>
+            <Text style={styles.introEmoji}>🌿</Text>
+          </View>
           <Text style={styles.introTitle}>Welcome to Kambalakonda!</Text>
           <Text style={styles.introText}>
-            You're a brave jungle explorer! Your mission is to spot all the amazing animals 
+            You&apos;re a brave jungle explorer! Your mission is to spot all the amazing animals 
             hiding in our beautiful sanctuary near Visakhapatnam.
           </Text>
           
@@ -217,12 +230,13 @@ export default function JungleExplorerGame() {
               • Look carefully at each animal that appears{'\n'}
               • Some animals are close (BIG), others are far (small){'\n'}
               • Tap when you see them clearly{'\n'}
-              • Find all 6 animals to complete your mission!
+              • Find enough animals to level up!
             </Text>
           </View>
 
           <TouchableOpacity style={styles.startButton} onPress={startGame}>
-            <Text style={styles.startButtonText}>🚀 Start Adventure</Text>
+            <Search size={24} color="#FFFFFF" />
+            <Text style={styles.startButtonText}>Start Adventure</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -237,8 +251,15 @@ export default function JungleExplorerGame() {
         </TouchableOpacity>
         
         <View style={styles.gameStats}>
-          <Text style={styles.statText}>🌟 {score} points</Text>
-          <Text style={styles.statText}>🔍 {animalsFound}/6 found</Text>
+          <View style={styles.statBadge}>
+            <Text style={styles.statText}>🌟 {score}</Text>
+          </View>
+          <View style={styles.statBadge}>
+            <Text style={styles.statText}>📍 Lvl {level}</Text>
+          </View>
+          <View style={styles.statBadge}>
+            <Text style={styles.statText}>🔍 {animalsFound}</Text>
+          </View>
         </View>
       </LinearGradient>
 
@@ -252,7 +273,7 @@ export default function JungleExplorerGame() {
 
         {currentAnimal && (
           <TouchableOpacity
-            style={[
+            style={[ 
               styles.animalContainer,
               {
                 left: currentAnimal.position.x,
@@ -263,7 +284,7 @@ export default function JungleExplorerGame() {
             activeOpacity={0.8}
           >
             <Animated.Text
-              style={[
+              style={[ 
                 styles.animalEmoji,
                 {
                   opacity: fadeAnim,
@@ -307,6 +328,7 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
+    zIndex: 10,
   },
   backButton: {
     width: 40,
@@ -326,8 +348,14 @@ const styles = StyleSheet.create({
   gameStats: {
     flex: 1,
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginLeft: 20,
+    justifyContent: 'flex-end',
+    gap: 8,
+  },
+  statBadge: {
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 12,
   },
   statText: {
     fontSize: 14,
@@ -340,9 +368,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 30,
   },
+  iconCircle: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+    borderWidth: 2,
+    borderColor: '#10B981',
+  },
   introEmoji: {
-    fontSize: 80,
-    marginBottom: 20,
+    fontSize: 60,
   },
   introTitle: {
     fontSize: 28,
@@ -368,6 +406,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 4,
+    width: '100%',
   },
   instructionsTitle: {
     fontSize: 18,
@@ -390,6 +429,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   startButtonText: {
     fontSize: 18,
@@ -398,7 +440,7 @@ const styles = StyleSheet.create({
   },
   gameArea: {
     flex: 1,
-    position: 'relative',
+    position: 'relative', // IMPORTANT: Changed from 'absolute' to 'relative' but actually needs to fill space below header
   },
   jungleBackground: {
     position: 'absolute',
@@ -420,6 +462,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     justifyContent: 'center',
     alignItems: 'center',
+    zIndex: 20,
   },
   animalEmoji: {
     fontSize: 60,
@@ -427,8 +470,7 @@ const styles = StyleSheet.create({
   instructionBubble: {
     position: 'absolute',
     bottom: 100,
-    left: 20,
-    right: 20,
+    alignSelf: 'center',
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
     padding: 16,
@@ -437,6 +479,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 4,
+    maxWidth: '90%',
   },
   completeContainer: {
     flex: 1,
@@ -473,6 +516,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 4,
+    width: '100%',
   },
   scoreItem: {
     alignItems: 'center',
@@ -498,6 +542,9 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingVertical: 16,
     alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
   },
   playAgainText: {
     fontSize: 16,

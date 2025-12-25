@@ -168,7 +168,7 @@ export default function BlinkingOwlTherapy() {
           <Text style={styles.introText}>
             Oliver wants to teach you the secret of healthy blinking! 
             When we look at screens too much, we forget to blink properly. 
-            Let's learn from the wisest owl in the forest!
+            Let&apos;s learn from the wisest owl in the forest!
           </Text>
           
           <View style={styles.instructionsCard}>
@@ -186,7 +186,7 @@ export default function BlinkingOwlTherapy() {
             <Text style={styles.benefitsTitle}>🌟 Why Healthy Blinking Helps:</Text>
             <Text style={styles.benefitsText}>
               Blinking spreads natural tears across your eyes, keeping them moist and comfortable. 
-              It's like giving your eyes a refreshing drink of water! 💧
+              It&apos;s like giving your eyes a refreshing drink of water! 💧
             </Text>
           </View>
 

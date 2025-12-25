@@ -1,78 +1,61 @@
 import { Tabs } from 'expo-router';
-import { Eye, BarChart3, BookOpen, User, Dumbbell, Baby } from 'lucide-react-native';
+import { Home, Activity, BookOpen, User, ClipboardList, Gamepad2 } from 'lucide-react-native';
+import { useTheme } from '../../contexts/ThemeContext';
 
 export default function TabLayout() {
+  const { theme } = useTheme();
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#3B82F6',
-        tabBarInactiveTintColor: '#6B7280',
         tabBarStyle: {
-          backgroundColor: '#FFFFFF',
-          borderTopWidth: 1,
-          borderTopColor: '#E5E7EB',
-          paddingBottom: 8,
-          paddingTop: 8,
-          height: 80,
+          backgroundColor: theme.colors.tabBar,
+          borderTopColor: theme.colors.border,
         },
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: '600',
-        },
+        tabBarActiveTintColor: theme.colors.tint,
+        tabBarInactiveTintColor: theme.colors.subtext,
       }}>
       <Tabs.Screen
         name="index"
         options={{
           title: 'Tests',
-          tabBarIcon: ({ size, color }) => (
-            <Eye size={size} color={color} />
-          ),
+          tabBarIcon: ({ color, size }) => <Home size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="exercises"
         options={{
           title: 'Exercises',
-          tabBarIcon: ({ size, color }) => (
-            <Dumbbell size={size} color={color} />
-          ),
+          tabBarIcon: ({ color, size }) => <Activity size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="kids"
         options={{
           title: 'Kids',
-          tabBarIcon: ({ size, color }) => (
-            <Baby size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="results"
-        options={{
-          title: 'Results',
-          tabBarIcon: ({ size, color }) => (
-            <BarChart3 size={size} color={color} />
-          ),
+          tabBarIcon: ({ color, size }) => <Gamepad2 size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="education"
         options={{
           title: 'Learn',
-          tabBarIcon: ({ size, color }) => (
-            <BookOpen size={size} color={color} />
-          ),
+          tabBarIcon: ({ color, size }) => <BookOpen size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="results"
+        options={{
+          title: 'Results',
+          tabBarIcon: ({ color, size }) => <ClipboardList size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ size, color }) => (
-            <User size={size} color={color} />
-          ),
+          tabBarIcon: ({ color, size }) => <User size={size} color={color} />,
         }}
       />
     </Tabs>

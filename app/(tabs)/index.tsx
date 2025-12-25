@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Eye, Palette, Target, Grid3X3, Zap, Clock, BookOpen, AlertTriangle, Settings } from 'lucide-react-native';
+import { Eye, Palette, Target, Grid3X3, Zap, Clock, BookOpen, AlertTriangle, Settings, ClipboardList } from 'lucide-react-native';
 import { router } from 'expo-router';
 
 const diagnosticTests = [
@@ -13,6 +13,24 @@ const diagnosticTests = [
     color: '#3B82F6',
     duration: '3-5 min',
     route: '/tests/visual-acuity',
+  },
+  {
+    id: 'symptom-check',
+    title: 'Symptom Checker',
+    description: 'Assess your digital eye strain levels',
+    icon: ClipboardList,
+    color: '#EF4444',
+    duration: '1-2 min',
+    route: '/tests/symptoms',
+  },
+  {
+    id: 'accommodation',
+    title: 'Accommodation Test',
+    description: 'Test your ability to switch focus (Near/Far)',
+    icon: Target,
+    color: '#8B5CF6',
+    duration: '1 min',
+    route: '/tests/accommodation',
   },
   {
     id: 'color-vision',
@@ -151,7 +169,7 @@ export default function TestsScreen() {
           <Text style={styles.quickTipsTitle}>💡 Quick Tips</Text>
           <Text style={styles.quickTipsText}>
             • Ensure good lighting when taking tests{'\n'}
-            • Hold your device at arm's length{'\n'}
+            • Hold your device at arm&apos;s length{'\n'}
             • Take breaks between tests{'\n'}
             • Test each eye separately when instructed
           </Text>

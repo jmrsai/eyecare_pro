@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { TrendingUp, Calendar, Eye, AlertCircle, Download } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { BarChart } from 'react-native-chart-kit';
+import { useTheme } from '../../contexts/ThemeContext';
+
+const screenWidth = Dimensions.get('window').width;
 
 interface TestResult {
   id: string;
@@ -14,6 +18,7 @@ interface TestResult {
 }
 
 export default function ResultsScreen() {
+  const { theme } = useTheme();
   const [results, setResults] = useState<TestResult[]>([]);
   const [overallScore, setOverallScore] = useState(85);
 
@@ -65,13 +70,13 @@ export default function ResultsScreen() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'normal':
-        return '#10B981';
+        return theme.colors.success;
       case 'attention':
-        return '#F59E0B';
+        return theme.colors.warning;
       case 'concern':
-        return '#EF4444';
+        return theme.colors.error;
       default:
-        return '#6B7280';
+        return theme.colors.subtext;
     }
   };
 
@@ -93,14 +98,37 @@ export default function ResultsScreen() {
     return date.toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
-      year: 'numeric',
     });
   };
 
+  const chartConfig = {
+    backgroundGradientFrom: theme.colors.card,
+    backgroundGradientTo: theme.colors.card,
+    color: (opacity = 1) => `rgba(16, 185, 129, ${opacity})`,
+    strokeWidth: 2,
+    barPercentage: 0.5,
+    decimalPlaces: 0,
+    labelColor: (opacity = 1) => theme.colors.subtext,
+    propsForBackgroundLines: {
+      strokeWidth: 1,
+      stroke: theme.colors.border,
+      strokeDasharray: "0",
+    },
+  };
+
+  const chartData = {
+    labels: results.slice(0, 5).reverse().map(r => formatDate(r.date)),
+    datasets: [
+      {
+        data: results.slice(0, 5).reverse().map(r => r.score),
+      },
+    ],
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <LinearGradient
-        colors={['#10B981', '#059669']}
+        colors={[theme.colors.success, theme.colors.primary]}
         style={styles.header}
       >
         <Text style={styles.headerTitle}>Your Results</Text>
@@ -109,70 +137,60 @@ export default function ResultsScreen() {
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Overall Health Score */}
-        <View style={styles.scoreCard}>
+        <View style={[styles.scoreCard, { backgroundColor: theme.colors.card }]}>
           <View style={styles.scoreHeader}>
-            <Text style={styles.scoreTitle}>Overall Eye Health Score</Text>
+            <Text style={[styles.scoreTitle, { color: theme.colors.text }]}>Overall Eye Health Score</Text>
             <TouchableOpacity style={styles.downloadButton}>
-              <Download size={20} color="#3B82F6" />
+              <Download size={20} color={theme.colors.primary} />
             </TouchableOpacity>
           </View>
           <View style={styles.scoreContent}>
-            <Text style={styles.scoreNumber}>{overallScore}</Text>
-            <Text style={styles.scoreOutOf}>/100</Text>
+            <Text style={[styles.scoreNumber, { color: theme.colors.success }]}>{overallScore}</Text>
+            <Text style={[styles.scoreOutOf, { color: theme.colors.subtext }]}>/100</Text>
           </View>
-          <View style={styles.scoreBar}>
-            <View style={[styles.scoreProgress, { width: `${overallScore}%` }]} />
+          <View style={[styles.scoreBar, { backgroundColor: theme.colors.border }]}>
+            <View style={[styles.scoreProgress, { width: `${overallScore}%`, backgroundColor: theme.colors.success }]} />
           </View>
-          <Text style={styles.scoreDescription}>
+          <Text style={[styles.scoreDescription, { color: theme.colors.subtext }]}>
             Good overall eye health. Continue regular monitoring.
           </Text>
         </View>
 
-        {/* Recent Tests */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Recent Test Results</Text>
+        {/* Trends */}
+        <View style={[styles.trendsCard, { backgroundColor: theme.colors.card }]}>
+          <View style={styles.trendsHeader}>
+            <TrendingUp size={20} color={theme.colors.success} />
+            <Text style={[styles.trendsTitle, { color: theme.colors.success }]}>Health Trends</Text>
+          </View>
           
-          {results.length === 0 ? (
-            <View style={styles.emptyState}>
-              <Eye size={48} color="#9CA3AF" />
-              <Text style={styles.emptyStateTitle}>No test results yet</Text>
-              <Text style={styles.emptyStateText}>
-                Complete your first eye test to see results here
-              </Text>
-            </View>
+          {results.length > 0 ? (
+            <BarChart
+              style={styles.chart}
+              data={chartData}
+              width={screenWidth - 40}
+              height={220}
+              yAxisLabel=""
+              yAxisSuffix=""
+              chartConfig={chartConfig}
+              verticalLabelRotation={0}
+              showValuesOnTopOfBars
+              fromZero
+            />
           ) : (
-            results.map((result) => (
-              <TouchableOpacity key={result.id} style={styles.resultCard}>
-                <View style={styles.resultHeader}>
-                  <View style={styles.resultInfo}>
-                    <Text style={styles.resultTitle}>{result.testType}</Text>
-                    <View style={styles.resultMeta}>
-                      <Calendar size={14} color="#6B7280" />
-                      <Text style={styles.resultDate}>{formatDate(result.date)}</Text>
-                    </View>
-                  </View>
-                  <View style={styles.resultScore}>
-                    <Text style={styles.scoreValue}>{result.score}</Text>
-                    <View style={[styles.statusBadge, { backgroundColor: `${getStatusColor(result.status)}15` }]}>
-                      <Text style={[styles.statusText, { color: getStatusColor(result.status) }]}>
-                        {getStatusText(result.status)}
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-                <Text style={styles.resultDetails}>{result.details}</Text>
-              </TouchableOpacity>
-            ))
+            <Text style={[styles.trendsText, { color: theme.colors.subtext }]}>
+              Your eye health trends will appear here after you complete more tests. 
+              Continue regular testing to monitor any changes.
+            </Text>
           )}
         </View>
 
         {/* Recommendations */}
-        <View style={styles.recommendationsCard}>
+        <View style={[styles.recommendationsCard, { backgroundColor: theme.colors.info + '15', borderColor: theme.colors.info }]}>
           <View style={styles.recommendationsHeader}>
-            <AlertCircle size={20} color="#3B82F6" />
-            <Text style={styles.recommendationsTitle}>Recommendations</Text>
+            <AlertCircle size={20} color={theme.colors.info} />
+            <Text style={[styles.recommendationsTitle, { color: theme.colors.info }]}>Recommendations</Text>
           </View>
-          <Text style={styles.recommendationsText}>
+          <Text style={[styles.recommendationsText, { color: theme.colors.text }]}>
             • Schedule a comprehensive eye exam with an eye care professional{'\n'}
             • Continue regular eye health monitoring{'\n'}
             • Follow up on astigmatism findings{'\n'}
@@ -180,16 +198,42 @@ export default function ResultsScreen() {
           </Text>
         </View>
 
-        {/* Trends */}
-        <View style={styles.trendsCard}>
-          <View style={styles.trendsHeader}>
-            <TrendingUp size={20} color="#10B981" />
-            <Text style={styles.trendsTitle}>Health Trends</Text>
-          </View>
-          <Text style={styles.trendsText}>
-            Your eye health has remained stable over the past month. 
-            Continue regular testing to monitor any changes.
-          </Text>
+        {/* Recent Tests */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Recent Test Results</Text>
+          
+          {results.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Eye size={48} color={theme.colors.subtext} />
+              <Text style={[styles.emptyStateTitle, { color: theme.colors.subtext }]}>No test results yet</Text>
+              <Text style={[styles.emptyStateText, { color: theme.colors.subtext }]}>
+                Complete your first eye test to see results here
+              </Text>
+            </View>
+          ) : (
+            results.map((result) => (
+              <TouchableOpacity key={result.id} style={[styles.resultCard, { backgroundColor: theme.colors.card }]}>
+                <View style={styles.resultHeader}>
+                  <View style={styles.resultInfo}>
+                    <Text style={[styles.resultTitle, { color: theme.colors.text }]}>{result.testType}</Text>
+                    <View style={styles.resultMeta}>
+                      <Calendar size={14} color={theme.colors.subtext} />
+                      <Text style={[styles.resultDate, { color: theme.colors.subtext }]}>{result.date}</Text>
+                    </View>
+                  </View>
+                  <View style={styles.resultScore}>
+                    <Text style={[styles.scoreValue, { color: theme.colors.text }]}>{result.score}</Text>
+                    <View style={[styles.statusBadge, { backgroundColor: getStatusColor(result.status) + '15' }]}>
+                      <Text style={[styles.statusText, { color: getStatusColor(result.status) }]}>
+                        {getStatusText(result.status)}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+                <Text style={[styles.resultDetails, { color: theme.colors.subtext }]}>{result.details}</Text>
+              </TouchableOpacity>
+            ))
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -199,7 +243,6 @@ export default function ResultsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
   },
   header: {
     paddingHorizontal: 20,
@@ -215,8 +258,7 @@ const styles = StyleSheet.create({
   },
   headerSubtitle: {
     fontSize: 16,
-    color: '#A7F3D0',
-    opacity: 0.9,
+    color: 'rgba(255,255,255,0.8)',
   },
   content: {
     flex: 1,
@@ -224,7 +266,6 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   scoreCard: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 20,
     marginBottom: 24,
@@ -243,7 +284,6 @@ const styles = StyleSheet.create({
   scoreTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1F2937',
   },
   downloadButton: {
     padding: 8,
@@ -256,27 +296,50 @@ const styles = StyleSheet.create({
   scoreNumber: {
     fontSize: 48,
     fontWeight: 'bold',
-    color: '#10B981',
   },
   scoreOutOf: {
     fontSize: 24,
-    color: '#6B7280',
     marginLeft: 4,
   },
   scoreBar: {
     height: 8,
-    backgroundColor: '#E5E7EB',
     borderRadius: 4,
     marginBottom: 12,
   },
   scoreProgress: {
     height: '100%',
-    backgroundColor: '#10B981',
     borderRadius: 4,
   },
   scoreDescription: {
     fontSize: 14,
-    color: '#6B7280',
+  },
+  trendsCard: {
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  trendsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  trendsTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
+  },
+  chart: {
+    marginVertical: 8,
+    borderRadius: 16,
+  },
+  trendsText: {
+    fontSize: 14,
+    lineHeight: 20,
   },
   section: {
     marginBottom: 24,
@@ -284,7 +347,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#1F2937',
     marginBottom: 16,
   },
   emptyState: {
@@ -294,17 +356,14 @@ const styles = StyleSheet.create({
   emptyStateTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#4B5563',
     marginTop: 16,
     marginBottom: 8,
   },
   emptyStateText: {
     fontSize: 14,
-    color: '#6B7280',
     textAlign: 'center',
   },
   resultCard: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
@@ -326,7 +385,6 @@ const styles = StyleSheet.create({
   resultTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1F2937',
     marginBottom: 4,
   },
   resultMeta: {
@@ -335,7 +393,6 @@ const styles = StyleSheet.create({
   },
   resultDate: {
     fontSize: 12,
-    color: '#6B7280',
     marginLeft: 4,
   },
   resultScore: {
@@ -344,7 +401,6 @@ const styles = StyleSheet.create({
   scoreValue: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#1F2937',
     marginBottom: 4,
   },
   statusBadge: {
@@ -358,15 +414,12 @@ const styles = StyleSheet.create({
   },
   resultDetails: {
     fontSize: 14,
-    color: '#6B7280',
   },
   recommendationsCard: {
-    backgroundColor: '#EFF6FF',
     borderRadius: 12,
     padding: 16,
-    marginBottom: 16,
+    marginBottom: 24,
     borderLeftWidth: 4,
-    borderLeftColor: '#3B82F6',
   },
   recommendationsHeader: {
     flexDirection: 'row',
@@ -376,36 +429,10 @@ const styles = StyleSheet.create({
   recommendationsTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1E40AF',
     marginLeft: 8,
   },
   recommendationsText: {
     fontSize: 14,
-    color: '#1E40AF',
-    lineHeight: 20,
-  },
-  trendsCard: {
-    backgroundColor: '#ECFDF5',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 20,
-    borderLeftWidth: 4,
-    borderLeftColor: '#10B981',
-  },
-  trendsHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  trendsTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#065F46',
-    marginLeft: 8,
-  },
-  trendsText: {
-    fontSize: 14,
-    color: '#065F46',
     lineHeight: 20,
   },
 });

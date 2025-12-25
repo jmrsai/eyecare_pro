@@ -298,7 +298,7 @@ export default function PupilResponseTest() {
           {testPhase === 'flash' && (
             <View style={styles.measuringContainer}>
               <Text style={styles.measuringText}>Recording pupil response...</Text>
-              <Text style={styles.measuringSubtext}>Don't blink</Text>
+              <Text style={styles.measuringSubtext}>Don&apos;t blink</Text>
             </View>
           )}
         </View>

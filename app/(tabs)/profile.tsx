@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, Switch, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, Switch, Alert, TextInput } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { User, Settings, Bell, Shield, HelpCircle, LogOut, Calendar, Eye, AlertTriangle } from 'lucide-react-native';
+import { User, Settings, Bell, Shield, HelpCircle, LogOut, Calendar, Eye, AlertTriangle, Edit2, Check, Pill } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 
@@ -15,6 +15,7 @@ interface UserProfile {
 }
 
 export default function ProfileScreen() {
+  const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState<UserProfile>({
     name: 'John Doe',
     email: 'john.doe@example.com',
@@ -46,6 +47,11 @@ export default function ProfileScreen() {
     } catch (error) {
       console.error('Error saving profile:', error);
     }
+  };
+
+  const handleSave = () => {
+    saveProfile(profile);
+    setIsEditing(false);
   };
 
   const toggleNotifications = () => {
@@ -100,9 +106,42 @@ export default function ProfileScreen() {
             <User size={32} color="#FFFFFF" />
           </View>
           <View style={styles.profileInfo}>
-            <Text style={styles.profileName}>{profile.name}</Text>
-            <Text style={styles.profileEmail}>{profile.email}</Text>
+            {isEditing ? (
+              <>
+                <TextInput 
+                  style={styles.editNameInput}
+                  value={profile.name}
+                  onChangeText={(text) => setProfile({...profile, name: text})}
+                  placeholder="Name"
+                  placeholderTextColor="rgba(255,255,255,0.6)"
+                />
+                <TextInput 
+                  style={styles.editEmailInput}
+                  value={profile.email}
+                  onChangeText={(text) => setProfile({...profile, email: text})}
+                  placeholder="Email"
+                  placeholderTextColor="rgba(255,255,255,0.6)"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+              </>
+            ) : (
+              <>
+                <Text style={styles.profileName}>{profile.name}</Text>
+                <Text style={styles.profileEmail}>{profile.email}</Text>
+              </>
+            )}
           </View>
+          <TouchableOpacity 
+            style={styles.editButton} 
+            onPress={isEditing ? handleSave : () => setIsEditing(true)}
+          >
+            {isEditing ? (
+              <Check size={24} color="#FFFFFF" />
+            ) : (
+              <Edit2 size={24} color="#FFFFFF" />
+            )}
+          </TouchableOpacity>
         </View>
       </LinearGradient>
 
@@ -172,6 +211,18 @@ export default function ProfileScreen() {
           <TouchableOpacity style={styles.menuItem} onPress={handleSettingsPress}>
             <Settings size={20} color="#6B7280" />
             <Text style={styles.menuLabel}>Account Settings</Text>
+            <Text style={styles.menuArrow}>›</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/medications')}>
+            <Pill size={20} color="#3B82F6" />
+            <Text style={styles.menuLabel}>Medications</Text>
+            <Text style={styles.menuArrow}>›</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/reminders')}>
+            <Bell size={20} color="#F59E0B" />
+            <Text style={styles.menuLabel}>Reminders</Text>
             <Text style={styles.menuArrow}>›</Text>
           </TouchableOpacity>
 
@@ -251,6 +302,28 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#C7D2FE',
     opacity: 0.9,
+  },
+  editNameInput: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.4)',
+    marginBottom: 4,
+    paddingVertical: 0,
+  },
+  editEmailInput: {
+    fontSize: 16,
+    color: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.4)',
+    paddingVertical: 0,
+  },
+  editButton: {
+    padding: 8,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 8,
+    marginLeft: 16,
   },
   content: {
     flex: 1,
