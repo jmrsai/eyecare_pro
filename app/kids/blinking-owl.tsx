@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ArrowLeft, Star, Heart } from 'lucide-react-native';
@@ -8,65 +8,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function BlinkingOwlTherapy() {
   const [therapyPhase, setTherapyPhase] = useState<'intro' | 'therapy' | 'complete'>('intro');
   const [blinksCompleted, setBlinksCompleted] = useState(0);
-  const [timeRemaining, setTimeRemaining] = useState(60); // 60 seconds
+  const [timeRemaining, setTimeRemaining] = useState(60);
   const [owlBlinkAnim] = useState(new Animated.Value(1));
   const [isBlinking, setIsBlinking] = useState(false);
 
-  useEffect(() => {
-    if (therapyPhase === 'therapy') {
-      startTherapy();
-    }
-  }, [therapyPhase]);
-
-  const startTherapy = () => {
-    const timer = setInterval(() => {
-      setTimeRemaining(prev => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          completeTherapy();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    // Start owl blinking pattern
-    startOwlBlinking();
-  };
-
-  const startOwlBlinking = () => {
-    const blinkPattern = () => {
-      setIsBlinking(true);
-      
-      // Blink animation
-      Animated.sequence([
-        Animated.timing(owlBlinkAnim, {
-          toValue: 0.1,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-        Animated.timing(owlBlinkAnim, {
-          toValue: 1,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-      ]).start(() => {
-        setIsBlinking(false);
-        setBlinksCompleted(prev => prev + 1);
-        
-        // Wait 2 seconds before next blink
-        setTimeout(() => {
-          if (therapyPhase === 'therapy') {
-            blinkPattern();
-          }
-        }, 2000);
-      });
-    };
-
-    blinkPattern();
-  };
-
-  const completeTherapy = async () => {
+  const completeTherapy = useCallback(async () => {
     setTherapyPhase('complete');
     
     try {
@@ -83,7 +29,58 @@ export default function BlinkingOwlTherapy() {
     } catch (error) {
       console.error('Error saving therapy stats:', error);
     }
-  };
+  }, []);
+
+  const startOwlBlinking = useCallback(() => {
+    const blinkPattern = () => {
+      setIsBlinking(true);
+      
+      Animated.sequence([
+        Animated.timing(owlBlinkAnim, {
+          toValue: 0.1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(owlBlinkAnim, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        setIsBlinking(false);
+        setBlinksCompleted(prev => prev + 1);
+        
+        setTimeout(() => {
+          if (therapyPhase === 'therapy') {
+            blinkPattern();
+          }
+        }, 2000);
+      });
+    };
+
+    blinkPattern();
+  }, [owlBlinkAnim, therapyPhase]);
+
+  const startTherapy = useCallback(() => {
+    const timer = setInterval(() => {
+      setTimeRemaining(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          completeTherapy();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    startOwlBlinking();
+  }, [completeTherapy, startOwlBlinking]);
+
+  useEffect(() => {
+    if (therapyPhase === 'therapy') {
+      startTherapy();
+    }
+  }, [therapyPhase, startTherapy]);
 
   const startTherapySession = () => {
     setTherapyPhase('therapy');

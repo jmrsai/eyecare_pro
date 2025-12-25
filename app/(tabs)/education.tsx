@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { BookOpen, Eye, AlertTriangle, Heart, Sun, Shield } from 'lucide-react-native';
+import { Eye, AlertTriangle, Heart, Sun, Shield } from 'lucide-react-native';
 
 interface EducationTopic {
   id: string;
@@ -19,23 +19,7 @@ const educationTopics: EducationTopic[] = [
     description: 'Learn about prevalent eye health issues and their symptoms',
     icon: Eye,
     color: '#3B82F6',
-    content: `**Myopia (Nearsightedness)**
-Difficulty seeing distant objects clearly. Often develops in childhood and can progress with age.
-
-**Hyperopia (Farsightedness)**
-Difficulty focusing on close objects. May cause eye strain and headaches.
-
-**Astigmatism**
-Irregular curvature of the cornea causing blurred or distorted vision at all distances.
-
-**Presbyopia**
-Age-related decline in near vision, typically beginning around age 40.
-
-**Cataracts**
-Clouding of the eye's natural lens, causing vision to become blurry or dim.
-
-**Glaucoma**
-Group of eye conditions that damage the optic nerve, often due to high eye pressure.`,
+    content: `**Myopia (Nearsightedness)**\nDifficulty seeing distant objects clearly. Often develops in childhood and can progress with age.\n\n**Hyperopia (Farsightedness)**\nDifficulty focusing on close objects. May cause eye strain and headaches.\n\n**Astigmatism**\nIrregular curvature of the cornea causing blurred or distorted vision at all distances.\n\n**Presbyopia**\nAge-related decline in near vision, typically beginning around age 40.\n\n**Cataracts**\nClouding of the eye\'s natural lens, causing vision to become blurry or dim.\n\n**Glaucoma**\nGroup of eye conditions that damage the optic nerve, often due to high eye pressure.`,
   },
   {
     id: 'diabetic-retinopathy',
@@ -43,27 +27,7 @@ Group of eye conditions that damage the optic nerve, often due to high eye press
     description: 'Understanding diabetes-related eye complications',
     icon: Heart,
     color: '#EF4444',
-    content: `**What is Diabetic Retinopathy?**
-A diabetes complication that affects the blood vessels in the retina, potentially leading to vision loss.
-
-**Stages:**
-• Mild nonproliferative retinopathy
-• Moderate nonproliferative retinopathy
-• Severe nonproliferative retinopathy
-• Proliferative retinopathy
-
-**Risk Factors:**
-• Poor blood sugar control
-• High blood pressure
-• High cholesterol
-• Pregnancy
-• Duration of diabetes
-
-**Prevention:**
-• Maintain good blood sugar control
-• Regular eye exams
-• Control blood pressure and cholesterol
-• Don't smoke`,
+    content: `**What is Diabetic Retinopathy?**\nA diabetes complication that affects the blood vessels in the retina, potentially leading to vision loss.\n\n**Stages:**\n• Mild nonproliferative retinopathy\n• Moderate nonproliferative retinopathy\n• Severe nonproliferative retinopathy\n• Proliferative retinopathy\n\n**Risk Factors:**\n• Poor blood sugar control\n• High blood pressure\n• High cholesterol\n• Pregnancy\n• Duration of diabetes\n\n**Prevention:**\n• Maintain good blood sugar control\n• Regular eye exams\n• Control blood pressure and cholesterol\n• Don\'t smoke`,
   },
   {
     id: 'macular-degeneration',
@@ -71,31 +35,7 @@ A diabetes complication that affects the blood vessels in the retina, potentiall
     description: 'Age-related central vision loss and prevention strategies',
     icon: AlertTriangle,
     color: '#F59E0B',
-    content: `**Age-Related Macular Degeneration (AMD)**
-Leading cause of vision loss in people over 50, affecting central vision.
-
-**Types:**
-• **Dry AMD:** Gradual breakdown of light-sensitive cells
-• **Wet AMD:** Abnormal blood vessel growth under the retina
-
-**Symptoms:**
-• Blurred or fuzzy vision
-• Straight lines appear wavy
-• Dark or empty areas in central vision
-• Colors appear less bright
-
-**Risk Factors:**
-• Age (over 50)
-• Family history
-• Smoking
-• High blood pressure
-• Obesity
-
-**Prevention:**
-• Eat leafy greens and fish
-• Don't smoke
-• Exercise regularly
-• Protect eyes from UV light`,
+    content: `**Age-Related Macular Degeneration (AMD)**\nLeading cause of vision loss in people over 50, affecting central vision.\n\n**Types:**\n• **Dry AMD:** Gradual breakdown of light-sensitive cells\n• **Wet AMD:** Abnormal blood vessel growth under the retina\n\n**Symptoms:**\n• Blurred or fuzzy vision\n• Straight lines appear wavy\n• Dark or empty areas in central vision\n• Colors appear less bright\n\n**Risk Factors:**\n• Age (over 50)\n• Family history\n• Smoking\n• High blood pressure\n• Obesity\n\n**Prevention:**\n• Eat leafy greens and fish\n• Don\'t smoke\n• Exercise regularly\n• Protect eyes from UV light`,
   },
   {
     id: 'digital-eye-strain',
@@ -103,26 +43,7 @@ Leading cause of vision loss in people over 50, affecting central vision.
     description: 'Managing computer vision syndrome in the digital age',
     icon: Sun,
     color: '#8B5CF6',
-    content: `**Computer Vision Syndrome**
-Eye discomfort and vision problems from prolonged digital device use.
-
-**Symptoms:**
-• Eye strain and fatigue
-• Dry eyes
-• Blurred vision
-• Neck and shoulder pain
-• Headaches
-
-**20-20-20 Rule:**
-Every 20 minutes, look at something 20 feet away for at least 20 seconds.
-
-**Prevention Tips:**
-• Adjust screen brightness and contrast
-• Position screen 20-26 inches away
-• Use artificial tears
-• Blink more frequently
-• Consider blue light filtering glasses
-• Take regular breaks`,
+    content: `**Computer Vision Syndrome**\nEye discomfort and vision problems from prolonged digital device use.\n\n**Symptoms:**\n• Eye strain and fatigue\n• Dry eyes\n• Blurred vision\n• Neck and shoulder pain\n• Headaches\n\n**20-20-20 Rule:**\nEvery 20 minutes, look at something 20 feet away for at least 20 seconds.\n\n**Prevention Tips:**\n• Adjust screen brightness and contrast\n• Position screen 20-26 inches away\n• Use artificial tears\n• Blink more frequently\n• Consider blue light filtering glasses\n• Take regular breaks`,
   },
   {
     id: 'eye-protection',
@@ -130,28 +51,7 @@ Every 20 minutes, look at something 20 feet away for at least 20 seconds.
     description: 'Essential tips for protecting your vision daily',
     icon: Shield,
     color: '#10B981',
-    content: `**UV Protection**
-Wear sunglasses that block 99-100% of UV-A and UV-B rays.
-
-**Workplace Safety**
-• Use appropriate safety eyewear
-• Follow safety protocols
-• Be aware of hazardous materials
-
-**Sports Protection**
-Wear protective eyewear during sports activities, especially racquet sports and baseball.
-
-**Home Safety**
-• Use caution with chemicals and cleaning products
-• Secure area rugs and improve lighting
-• Keep sharp objects away from eyes
-
-**Nutrition for Eye Health**
-• Leafy green vegetables
-• Fish high in omega-3 fatty acids
-• Eggs, nuts, and beans
-• Oranges and citrus fruits
-• Oysters and pork`,
+    content: `**UV Protection**\nWear sunglasses that block 99-100% of UV-A and UV-B rays.\n\n**Workplace Safety**\n• Use appropriate safety eyewear\n• Follow safety protocols\n• Be aware of hazardous materials\n\n**Sports Protection**\nWear protective eyewear during sports activities, especially racquet sports and baseball.\n\n**Home Safety**\n• Use caution with chemicals and cleaning products\n• Secure area rugs and improve lighting\n• Keep sharp objects away from eyes\n\n**Nutrition for Eye Health**\n• Leafy green vegetables\n• Fish high in omega-3 fatty acids\n• Eggs, nuts, and beans\n• Oranges and citrus fruits\n• Oysters and pork`,
   },
 ];
 

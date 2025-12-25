@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Zap, ArrowLeft, Play, Pause, CheckCircle } from 'lucide-react-native';
@@ -47,7 +47,6 @@ export default function QuickBreakExercise() {
   const [isActive, setIsActive] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   
-  // Animation values
   const blinkAnim = new Animated.Value(1);
   const trackAnim = new Animated.Value(0);
   const focusAnim = new Animated.Value(0);
@@ -58,125 +57,7 @@ export default function QuickBreakExercise() {
                  (currentExercise.duration - timeRemaining);
   const progress = elapsed / totalDuration;
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-    
-    if (isActive && timeRemaining > 0) {
-      interval = setInterval(() => {
-        setTimeRemaining(time => {
-          if (time <= 1) {
-            nextExercise();
-            return 0;
-          }
-          return time - 1;
-        });
-      }, 1000);
-    }
-
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isActive, timeRemaining]);
-
-  useEffect(() => {
-    if (isActive) {
-      startAnimation();
-    } else {
-      stopAnimation();
-    }
-  }, [isActive, currentExercise.animation]);
-
-  const startAnimation = () => {
-    switch (currentExercise.animation) {
-      case 'blink':
-        startBlinkAnimation();
-        break;
-      case 'track':
-        startTrackingAnimation();
-        break;
-      case 'focus':
-        startFocusAnimation();
-        break;
-    }
-  };
-
-  const stopAnimation = () => {
-    blinkAnim.stopAnimation();
-    trackAnim.stopAnimation();
-    focusAnim.stopAnimation();
-  };
-
-  const startBlinkAnimation = () => {
-    const blink = () => {
-      Animated.sequence([
-        Animated.timing(blinkAnim, {
-          toValue: 0.1,
-          duration: 100,
-          useNativeDriver: true,
-        }),
-        Animated.timing(blinkAnim, {
-          toValue: 1,
-          duration: 100,
-          useNativeDriver: true,
-        }),
-      ]).start(() => {
-        if (isActive && currentExercise.animation === 'blink') {
-          setTimeout(blink, 200);
-        }
-      });
-    };
-    blink();
-  };
-
-  const startTrackingAnimation = () => {
-    const track = () => {
-      Animated.timing(trackAnim, {
-        toValue: 1,
-        duration: 4000,
-        useNativeDriver: true,
-      }).start(() => {
-        if (isActive && currentExercise.animation === 'track') {
-          trackAnim.setValue(0);
-          track();
-        }
-      });
-    };
-    track();
-  };
-
-  const startFocusAnimation = () => {
-    const focus = () => {
-      Animated.sequence([
-        Animated.timing(focusAnim, {
-          toValue: 1,
-          duration: 1500,
-          useNativeDriver: true,
-        }),
-        Animated.timing(focusAnim, {
-          toValue: 0,
-          duration: 1500,
-          useNativeDriver: true,
-        }),
-      ]).start(() => {
-        if (isActive && currentExercise.animation === 'focus') {
-          focus();
-        }
-      });
-    };
-    focus();
-  };
-
-  const nextExercise = async () => {
-    if (currentExerciseIndex < QUICK_EXERCISES.length - 1) {
-      setCurrentExerciseIndex(prev => prev + 1);
-      setTimeRemaining(QUICK_EXERCISES[currentExerciseIndex + 1].duration);
-      setIsActive(false);
-    } else {
-      await completeWorkout();
-    }
-  };
-
-  const completeWorkout = async () => {
+  const completeWorkout = useCallback(async () => {
     setIsComplete(true);
     setIsActive(false);
 
@@ -198,7 +79,125 @@ export default function QuickBreakExercise() {
     } catch (error) {
       console.error('Error saving exercise stats:', error);
     }
-  };
+  }, [totalDuration]);
+
+  const nextExercise = useCallback(async () => {
+    if (currentExerciseIndex < QUICK_EXERCISES.length - 1) {
+      setCurrentExerciseIndex(prev => prev + 1);
+      setTimeRemaining(QUICK_EXERCISES[currentExerciseIndex + 1].duration);
+      setIsActive(false);
+    } else {
+      await completeWorkout();
+    }
+  }, [currentExerciseIndex, completeWorkout]);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+    
+    if (isActive && timeRemaining > 0) {
+      interval = setInterval(() => {
+        setTimeRemaining(time => {
+          if (time <= 1) {
+            nextExercise();
+            return 0;
+          }
+          return time - 1;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isActive, timeRemaining, nextExercise]);
+
+  const startBlinkAnimation = useCallback(() => {
+    const blink = () => {
+      Animated.sequence([
+        Animated.timing(blinkAnim, {
+          toValue: 0.1,
+          duration: 100,
+          useNativeDriver: true,
+        }),
+        Animated.timing(blinkAnim, {
+          toValue: 1,
+          duration: 100,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        if (isActive && currentExercise.animation === 'blink') {
+          setTimeout(blink, 200);
+        }
+      });
+    };
+    blink();
+  }, [blinkAnim, isActive, currentExercise.animation]);
+
+  const startTrackingAnimation = useCallback(() => {
+    const track = () => {
+      Animated.timing(trackAnim, {
+        toValue: 1,
+        duration: 4000,
+        useNativeDriver: true,
+      }).start(() => {
+        if (isActive && currentExercise.animation === 'track') {
+          trackAnim.setValue(0);
+          track();
+        }
+      });
+    };
+    track();
+  }, [trackAnim, isActive, currentExercise.animation]);
+
+  const startFocusAnimation = useCallback(() => {
+    const focus = () => {
+      Animated.sequence([
+        Animated.timing(focusAnim, {
+          toValue: 1,
+          duration: 1500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(focusAnim, {
+          toValue: 0,
+          duration: 1500,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        if (isActive && currentExercise.animation === 'focus') {
+          focus();
+        }
+      });
+    };
+    focus();
+  }, [focusAnim, isActive, currentExercise.animation]);
+
+  const startAnimation = useCallback(() => {
+    switch (currentExercise.animation) {
+      case 'blink':
+        startBlinkAnimation();
+        break;
+      case 'track':
+        startTrackingAnimation();
+        break;
+      case 'focus':
+        startFocusAnimation();
+        break;
+    }
+  }, [currentExercise.animation, startBlinkAnimation, startTrackingAnimation, startFocusAnimation]);
+
+  const stopAnimation = useCallback(() => {
+    blinkAnim.stopAnimation();
+    trackAnim.stopAnimation();
+    focusAnim.stopAnimation();
+  }, [blinkAnim, trackAnim, focusAnim]);
+
+  useEffect(() => {
+    if (isActive) {
+      startAnimation();
+    } else {
+      stopAnimation();
+    }
+  }, [isActive, startAnimation, stopAnimation]);
 
   const toggleTimer = () => {
     setIsActive(!isActive);

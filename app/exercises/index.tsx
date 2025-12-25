@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Dumbbell, Clock, Target, Eye, Zap, Moon, Sun, TrendingUp } from 'lucide-react-native';
+import { Dumbbell, Clock, Target, Eye, Zap, Moon, Sun, TrendingUp, Play } from 'lucide-react-native';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -19,15 +19,15 @@ interface ExerciseProgram {
 
 const EXERCISE_PROGRAMS: ExerciseProgram[] = [
   {
-    id: 'morning-reset',
-    title: '5-Minute Morning Reset',
-    description: 'Start your day with gentle eye awakening exercises',
-    duration: '5 min',
+    id: 'quick-break',
+    title: 'Quick Screen Break',
+    description: 'Perfect 2-minute break during work',
+    duration: '2 min',
     difficulty: 'Beginner',
-    icon: Sun,
-    color: '#F59E0B',
-    exercises: ['Palming', 'Gentle Blinking', 'Focus Shifts', 'Eye Circles'],
-    route: '/exercises/morning-reset',
+    icon: Zap,
+    color: '#06B6D4',
+    exercises: ['Rapid Blinking', 'Figure-8 Tracking', 'Near-Far Focus'],
+    route: '/exercises/quick-break',
   },
   {
     id: 'digital-detox',
@@ -37,8 +37,19 @@ const EXERCISE_PROGRAMS: ExerciseProgram[] = [
     difficulty: 'Beginner',
     icon: Eye,
     color: '#3B82F6',
-    exercises: ['20-20-20 Rule', 'Convergence Training', 'Accommodation Flex', 'Palming'],
+    exercises: ['20-20-20 Rule', 'Palming', 'Focus Shifts', 'Eye Massage'],
     route: '/exercises/digital-detox',
+  },
+  {
+    id: 'morning-reset',
+    title: '5-Minute Morning Reset',
+    description: 'Start your day with gentle eye awakening exercises',
+    duration: '5 min',
+    difficulty: 'Beginner',
+    icon: Sun,
+    color: '#F59E0B',
+    exercises: ['Palming', 'Gentle Blinking', 'Focus Shifts', 'Eye Circles'],
+    route: '/exercises/morning-reset',
   },
   {
     id: 'focus-endurance',
@@ -72,17 +83,6 @@ const EXERCISE_PROGRAMS: ExerciseProgram[] = [
     color: '#EF4444',
     exercises: ['Convergence Training', 'Divergence Exercises', 'Pursuit Training', 'Fixation'],
     route: '/exercises/vision-therapy',
-  },
-  {
-    id: 'quick-break',
-    title: 'Quick Screen Break',
-    description: 'Perfect 2-minute break during work',
-    duration: '2 min',
-    difficulty: 'Beginner',
-    icon: Zap,
-    color: '#06B6D4',
-    exercises: ['Rapid Blinking', 'Figure-8 Tracking', 'Near-Far Focus'],
-    route: '/exercises/quick-break',
   },
 ];
 
@@ -160,12 +160,12 @@ export default function ExercisesScreen() {
         <View style={styles.recommendationCard}>
           <View style={styles.recommendationHeader}>
             <Sun size={20} color="#F59E0B" />
-            <Text style={styles.recommendationTitle}>Today's Recommendation</Text>
+            <Text style={styles.recommendationTitle}>Today&apos;s Recommendation</Text>
           </View>
           <Text style={styles.recommendationText}>
             {completedToday 
               ? <>Great job! You&apos;ve completed your daily eye workout. Consider a quick break session if you&apos;re still working.</>
-              : "Start with the 5-Minute Morning Reset to prepare your eyes for the day ahead."
+              : "Start with the Quick Screen Break - perfect for your current work session!"
             }
           </Text>
         </View>
@@ -201,6 +201,9 @@ export default function ExercisesScreen() {
                     </View>
                   </View>
                 </View>
+                <View style={styles.playIcon}>
+                  <Play size={16} color="#6B7280" />
+                </View>
               </View>
               <View style={styles.exercisesList}>
                 <Text style={styles.exercisesLabel}>Includes:</Text>
@@ -218,6 +221,18 @@ export default function ExercisesScreen() {
             • Take breaks if you feel any discomfort{'\n'}
             • Consistency is more important than intensity{'\n'}
             • Combine with regular eye exams for best results
+          </Text>
+        </View>
+
+        {/* Benefits Section */}
+        <View style={styles.benefitsCard}>
+          <Text style={styles.benefitsTitle}>🎯 Benefits of Regular Eye Exercise</Text>
+          <Text style={styles.benefitsText}>
+            • Reduced digital eye strain and fatigue{'\n'}
+            • Improved focus flexibility and endurance{'\n'}
+            • Better tear film distribution{'\n'}
+            • Enhanced visual comfort during screen work{'\n'}
+            • Stronger eye muscle coordination
           </Text>
         </View>
       </ScrollView>
@@ -378,6 +393,15 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
   },
+  playIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F3F4F6',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 12,
+  },
   exercisesList: {
     borderTopWidth: 1,
     borderTopColor: '#E5E7EB',
@@ -398,7 +422,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F0F9FF',
     borderRadius: 12,
     padding: 16,
-    marginBottom: 20,
+    marginBottom: 16,
     borderLeftWidth: 4,
     borderLeftColor: '#0EA5E9',
   },
@@ -411,6 +435,25 @@ const styles = StyleSheet.create({
   tipsText: {
     fontSize: 14,
     color: '#0C4A6E',
+    lineHeight: 20,
+  },
+  benefitsCard: {
+    backgroundColor: '#ECFDF5',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
+    borderLeftWidth: 4,
+    borderLeftColor: '#10B981',
+  },
+  benefitsTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#065F46',
+    marginBottom: 8,
+  },
+  benefitsText: {
+    fontSize: 14,
+    color: '#065F46',
     lineHeight: 20,
   },
 });

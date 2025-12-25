@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Eye, ArrowLeft, Play, Pause, RotateCcw, CheckCircle } from 'lucide-react-native';
@@ -99,6 +99,41 @@ export default function DigitalDetoxExercise() {
   const totalExercises = DIGITAL_DETOX_EXERCISES.length;
   const progress = (currentExerciseIndex + (currentExercise.duration - timeRemaining) / currentExercise.duration) / totalExercises;
 
+  const completeWorkout = useCallback(async () => {
+    setIsComplete(true);
+    setIsActive(false);
+
+    try {
+      const stats = await AsyncStorage.getItem('exerciseStats');
+      const currentStats = stats ? JSON.parse(stats) : {};
+      
+      const today = new Date().toDateString();
+      const totalMinutes = Math.round(DIGITAL_DETOX_EXERCISES.reduce((sum, ex) => sum + ex.duration, 0) / 60);
+      
+      const updatedStats = {
+        ...currentStats,
+        totalMinutes: (currentStats.totalMinutes || 0) + totalMinutes,
+        lastCompletedDate: today,
+        weeklyStreak: currentStats.lastCompletedDate === today ? currentStats.weeklyStreak : (currentStats.weeklyStreak || 0) + 1,
+      };
+
+      await AsyncStorage.setItem('exerciseStats', JSON.stringify(updatedStats));
+    } catch (error) {
+      console.error('Error saving exercise stats:', error);
+    }
+  }, []);
+
+  const nextExercise = useCallback(async () => {
+    if (currentExerciseIndex < totalExercises - 1) {
+      setCurrentExerciseIndex(prev => prev + 1);
+      setTimeRemaining(DIGITAL_DETOX_EXERCISES[currentExerciseIndex + 1].duration);
+      setCurrentInstruction(0);
+      setIsActive(false);
+    } else {
+      await completeWorkout();
+    }
+  }, [currentExerciseIndex, totalExercises, completeWorkout]);
+
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
     
@@ -117,17 +152,15 @@ export default function DigitalDetoxExercise() {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isActive, timeRemaining]);
+  }, [isActive, timeRemaining, nextExercise]);
 
   useEffect(() => {
-    // Cycle through instructions during active exercises
     if (isActive && currentExercise.type === 'active') {
       const instructionInterval = setInterval(() => {
         setCurrentInstruction(prev => 
           (prev + 1) % currentExercise.instructions.length
         );
         
-        // Fade animation for instruction changes
         Animated.sequence([
           Animated.timing(fadeAnim, {
             toValue: 0.3,
@@ -144,43 +177,7 @@ export default function DigitalDetoxExercise() {
 
       return () => clearInterval(instructionInterval);
     }
-  }, [isActive, currentExercise]);
-
-  const nextExercise = async () => {
-    if (currentExerciseIndex < totalExercises - 1) {
-      setCurrentExerciseIndex(prev => prev + 1);
-      setTimeRemaining(DIGITAL_DETOX_EXERCISES[currentExerciseIndex + 1].duration);
-      setCurrentInstruction(0);
-      setIsActive(false);
-    } else {
-      await completeWorkout();
-    }
-  };
-
-  const completeWorkout = async () => {
-    setIsComplete(true);
-    setIsActive(false);
-
-    try {
-      // Update exercise stats
-      const stats = await AsyncStorage.getItem('exerciseStats');
-      const currentStats = stats ? JSON.parse(stats) : {};
-      
-      const today = new Date().toDateString();
-      const totalMinutes = Math.round(DIGITAL_DETOX_EXERCISES.reduce((sum, ex) => sum + ex.duration, 0) / 60);
-      
-      const updatedStats = {
-        ...currentStats,
-        totalMinutes: (currentStats.totalMinutes || 0) + totalMinutes,
-        lastCompletedDate: today,
-        weeklyStreak: currentStats.lastCompletedDate === today ? currentStats.weeklyStreak : (currentStats.weeklyStreak || 0) + 1,
-      };
-
-      await AsyncStorage.setItem('exerciseStats', JSON.stringify(updatedStats));
-    } catch (error) {
-      console.error('Error saving exercise stats:', error);
-    }
-  };
+  }, [isActive, currentExercise, fadeAnim]);
 
   const toggleTimer = () => {
     setIsActive(!isActive);

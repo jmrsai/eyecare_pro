@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Baby, Star, Heart, Gamepad2, Sparkles } from 'lucide-react-native';
+import { Sparkles } from 'lucide-react-native';
 import { router } from 'expo-router';
 
 export default function KidsTabScreen() {
