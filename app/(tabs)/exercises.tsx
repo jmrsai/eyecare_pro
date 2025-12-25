@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Dumbbell, Clock, Target, Eye, Zap, Moon, Sun, TrendingUp, Play } from 'lucide-react-native';
+import { Dumbbell, Clock, Target, Eye, Zap, Moon, Sun, TrendingUp, Play, Wind } from 'lucide-react-native';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -28,6 +28,17 @@ const EXERCISE_PROGRAMS: ExerciseProgram[] = [
     color: '#06B6D4',
     exercises: ['Rapid Blinking', 'Figure-8 Tracking', 'Near-Far Focus'],
     route: '/exercises/quick-break',
+  },
+  {
+    id: 'eye-yoga',
+    title: 'Eye Yoga & Relaxation',
+    description: 'Ancient techniques to relax and strengthen eyes',
+    duration: '4 min',
+    difficulty: 'Beginner',
+    icon: Wind,
+    color: '#8B5CF6',
+    exercises: ['Palming', 'Sideways Look', 'Up-Down Look', 'Rotational View'],
+    route: '/exercises/eye-yoga',
   },
   {
     id: 'digital-detox',

@@ -10,7 +10,7 @@ Visual Acuity (Snellen Chart)
 Color Vision (Ishihara, HRR, D-15)
 Macular Health (Amsler Grid)
 Astigmatism, Contrast Sensitivity, and more.
-Eye Gym: A dedicated section with guided individual exercises and structured workout circuits designed to reduce eye strain and improve focus.
+Eye Gym: A dedicated section with guided individual exercises, Eye Yoga, and structured workout circuits designed to reduce eye strain and improve focus.
 Progress Tracking & Reminders:
 Track your Vision Score and progress over time.
 Log medication adherence and view your history.
