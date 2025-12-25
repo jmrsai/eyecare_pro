@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-export default function BlinkingOwlScreen() {
+export default function KidsSettingsScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Blinking Owl</Text>
-      <Text>Therapy coming soon!</Text>
+      <Text style={styles.title}>Kids Settings</Text>
+      <Text>Settings coming soon!</Text>
     </View>
   );
 }

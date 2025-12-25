@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-export default function BlinkingOwlScreen() {
+export default function MagicEyeHugScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Blinking Owl</Text>
+      <Text style={styles.title}>Magic Eye Hug</Text>
       <Text>Therapy coming soon!</Text>
     </View>
   );
