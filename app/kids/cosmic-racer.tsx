@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Animated, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ArrowLeft, Star, Trophy, Play, RotateCcw } from 'lucide-react-native';
@@ -16,7 +16,6 @@ export default function CosmicRacerGame() {
   const [lapsCompleted, setLapsCompleted] = useState(0);
   const [raceAnim] = useState(new Animated.Value(0));
   const [starAnim] = useState(new Animated.Value(0));
-  const progressRef = useRef(0);
 
   useEffect(() => {
     if (gamePhase === 'playing') {
@@ -26,16 +25,9 @@ export default function CosmicRacerGame() {
 
   const startRace = () => {
     raceAnim.setValue(0);
-    progressRef.current = 0;
-
-    const listener = raceAnim.addListener(({ value }) => {
-      progressRef.current = value;
-    });
-
-    // Speed increases with level: Level 1 = 4000ms, Level 2 = 3000ms, Level 3 = 2000ms
+    
     const duration = Math.max(1500, 5000 - (level * 1000));
 
-    // Create figure-8 animation
     const raceLoop = () => {
       Animated.timing(raceAnim, {
         toValue: 1,
@@ -52,14 +44,13 @@ export default function CosmicRacerGame() {
             if (level < 3) {
               setLevel(prev => prev + 1);
               setLapsCompleted(0);
-              // Small pause before next level
               setTimeout(raceLoop, 1000); 
             } else {
               completeGame();
             }
           } else {
             raceAnim.setValue(0);
-            raceLoop(); // Continue racing
+            raceLoop();
           }
         }
       });
@@ -67,7 +58,6 @@ export default function CosmicRacerGame() {
 
     raceLoop();
     
-    // Animate stars
     Animated.loop(
       Animated.sequence([
         Animated.timing(starAnim, {
@@ -84,7 +74,6 @@ export default function CosmicRacerGame() {
     ).start();
 
     return () => {
-        raceAnim.removeListener(listener);
         raceAnim.stopAnimation();
     };
   };
@@ -126,7 +115,6 @@ export default function CosmicRacerGame() {
     setLapsCompleted(0);
   };
 
-  // Interpolation for smooth animation
   const moveX = raceAnim.interpolate({
     inputRange: [0, 0.25, 0.5, 0.75, 1],
     outputRange: [width / 2 - 20, width - 60, width / 2 - 20, 20, width / 2 - 20]
@@ -429,7 +417,7 @@ const styles = StyleSheet.create({
   },
   gameArea: {
     flex: 1,
-    position: 'absolute', // Make it fill screen
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
@@ -452,7 +440,6 @@ const styles = StyleSheet.create({
     height: 60,
     justifyContent: 'center',
     alignItems: 'center',
-    // Center point logic handled in translation
     top: 0,
     left: 0,
   },
