@@ -70,11 +70,11 @@ export default function ResultsScreen() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'normal':
-        return theme.colors.success;
+        return theme.colors.primary;
       case 'attention':
         return theme.colors.warning;
       case 'concern':
-        return theme.colors.error;
+        return theme.colors.notification;
       default:
         return theme.colors.subtext;
     }
@@ -128,7 +128,7 @@ export default function ResultsScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <LinearGradient
-        colors={[theme.colors.success, theme.colors.primary]}
+        colors={[theme.colors.primary, theme.colors.info]}
         style={styles.header}
       >
         <Text style={styles.headerTitle}>Your Results</Text>
@@ -145,11 +145,11 @@ export default function ResultsScreen() {
             </TouchableOpacity>
           </View>
           <View style={styles.scoreContent}>
-            <Text style={[styles.scoreNumber, { color: theme.colors.success }]}>{overallScore}</Text>
+            <Text style={[styles.scoreNumber, { color: theme.colors.primary }]}>{overallScore}</Text>
             <Text style={[styles.scoreOutOf, { color: theme.colors.subtext }]}>/100</Text>
           </View>
           <View style={[styles.scoreBar, { backgroundColor: theme.colors.border }]}>
-            <View style={[styles.scoreProgress, { width: `${overallScore}%`, backgroundColor: theme.colors.success }]} />
+            <View style={[styles.scoreProgress, { width: `${overallScore}%`, backgroundColor: theme.colors.primary }]} />
           </View>
           <Text style={[styles.scoreDescription, { color: theme.colors.subtext }]}>
             Good overall eye health. Continue regular monitoring.
@@ -159,8 +159,8 @@ export default function ResultsScreen() {
         {/* Trends */}
         <View style={[styles.trendsCard, { backgroundColor: theme.colors.card }]}>
           <View style={styles.trendsHeader}>
-            <TrendingUp size={20} color={theme.colors.success} />
-            <Text style={[styles.trendsTitle, { color: theme.colors.success }]}>Health Trends</Text>
+            <TrendingUp size={20} color={theme.colors.primary} />
+            <Text style={[styles.trendsTitle, { color: theme.colors.primary }]}>Health Trends</Text>
           </View>
           
           {results.length > 0 ? (
@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 28,
-    fontWeight: 'bold',
+    fontWeight: 'bold' as const,
     color: '#FFFFFF',
     marginBottom: 4,
   },
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
   },
   scoreTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: '600' as const,
   },
   downloadButton: {
     padding: 8,
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
   },
   scoreNumber: {
     fontSize: 48,
-    fontWeight: 'bold',
+    fontWeight: 'bold' as const,
   },
   scoreOutOf: {
     fontSize: 24,
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
   },
   trendsTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     marginLeft: 8,
   },
   chart: {
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: 'bold' as const,
     marginBottom: 16,
   },
   emptyState: {
@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
   },
   emptyStateTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     marginTop: 16,
     marginBottom: 8,
   },
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
   },
   resultTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     marginBottom: 4,
   },
   resultMeta: {
@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
   },
   scoreValue: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: 'bold' as const,
     marginBottom: 4,
   },
   statusBadge: {
@@ -410,7 +410,7 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '600' as const,
   },
   resultDetails: {
     fontSize: 14,
@@ -428,7 +428,7 @@ const styles = StyleSheet.create({
   },
   recommendationsTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     marginLeft: 8,
   },
   recommendationsText: {

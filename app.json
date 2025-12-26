@@ -18,6 +18,11 @@
         "projectId": "3db747e7-82ba-4ba8-baf2-258a5591e49c"
       }
     },
-    "owner": "opthas"
+    "owner": "opthas",
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-sqlite"
+    ]
   }
 }

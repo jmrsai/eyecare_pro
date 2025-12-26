@@ -79,11 +79,11 @@ export default function ProfileScreen() {
   };
 
   const handleSettingsPress = () => {
-    router.push('/settings');
+    router.push('/settings' as any);
   };
 
   const handleEmergencyPress = () => {
-    router.push('/emergency');
+    router.push('/emergency' as any);
   };
 
   const formatDate = (dateString: string) => {
@@ -214,13 +214,13 @@ export default function ProfileScreen() {
             <Text style={styles.menuArrow}>›</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/medications')}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/medications' as any)}>
             <Pill size={20} color="#3B82F6" />
             <Text style={styles.menuLabel}>Medications</Text>
             <Text style={styles.menuArrow}>›</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/reminders')}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/reminders' as any)}>
             <Bell size={20} color="#F59E0B" />
             <Text style={styles.menuLabel}>Reminders</Text>
             <Text style={styles.menuArrow}>›</Text>
@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
   },
   profileName: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: 'bold' as const,
     color: '#FFFFFF',
     marginBottom: 4,
   },
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
   },
   editNameInput: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: 'bold' as const,
     color: '#FFFFFF',
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255,255,255,0.4)',
@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
   },
   summaryTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     color: '#1F2937',
     marginBottom: 16,
   },
@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
   },
   summaryValue: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     color: '#1F2937',
     textAlign: 'center',
   },
@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: 'bold' as const,
     color: '#1F2937',
     marginBottom: 16,
   },
@@ -401,7 +401,7 @@ const styles = StyleSheet.create({
   },
   settingLabel: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     color: '#1F2937',
     marginLeft: 12,
   },
@@ -425,7 +425,7 @@ const styles = StyleSheet.create({
   },
   menuLabel: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: '500' as const,
     color: '#1F2937',
     marginLeft: 12,
     flex: 1,
@@ -444,7 +444,7 @@ const styles = StyleSheet.create({
   },
   privacyTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     color: '#065F46',
     marginBottom: 8,
   },
@@ -460,7 +460,7 @@ const styles = StyleSheet.create({
   },
   appInfoTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: 'bold' as const,
     color: '#1F2937',
     marginBottom: 8,
   },

@@ -155,8 +155,9 @@ export default function DigitalDetoxExercise() {
   }, [isActive, timeRemaining, nextExercise]);
 
   useEffect(() => {
+    let instructionInterval: NodeJS.Timeout | null = null;
     if (isActive && currentExercise.type === 'active') {
-      const instructionInterval = setInterval(() => {
+      instructionInterval = setInterval(() => {
         setCurrentInstruction(prev => 
           (prev + 1) % currentExercise.instructions.length
         );
@@ -175,7 +176,9 @@ export default function DigitalDetoxExercise() {
         ]).start();
       }, 3000);
 
-      return () => clearInterval(instructionInterval);
+      return () => {
+        if (instructionInterval) clearInterval(instructionInterval);
+      };
     }
   }, [isActive, currentExercise, fadeAnim]);
 
@@ -331,7 +334,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 28,
-    fontWeight: 'bold',
+    fontWeight: 'bold' as const,
     color: '#FFFFFF',
     marginBottom: 4,
   },
@@ -386,7 +389,7 @@ const styles = StyleSheet.create({
   },
   exerciseName: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: 'bold' as const,
     color: '#1F2937',
     marginBottom: 8,
     textAlign: 'center',
@@ -402,7 +405,7 @@ const styles = StyleSheet.create({
   },
   timerText: {
     fontSize: 48,
-    fontWeight: 'bold',
+    fontWeight: 'bold' as const,
     color: '#3B82F6',
   },
   timerLabel: {
@@ -420,7 +423,7 @@ const styles = StyleSheet.create({
   },
   instructionsTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     color: '#0C4A6E',
     marginBottom: 12,
   },
@@ -435,7 +438,7 @@ const styles = StyleSheet.create({
     color: '#0C4A6E',
     lineHeight: 24,
     textAlign: 'center',
-    fontWeight: '500',
+    fontWeight: '500' as const,
   },
   controlsContainer: {
     flexDirection: 'row',
@@ -472,7 +475,7 @@ const styles = StyleSheet.create({
   },
   skipButtonText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     color: '#6B7280',
   },
   completeContainer: {
@@ -483,7 +486,7 @@ const styles = StyleSheet.create({
   },
   completeTitle: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: 'bold' as const,
     color: '#1F2937',
     marginTop: 20,
     marginBottom: 16,
@@ -507,7 +510,7 @@ const styles = StyleSheet.create({
   },
   benefitsTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     color: '#065F46',
     marginBottom: 8,
   },
@@ -525,7 +528,7 @@ const styles = StyleSheet.create({
   },
   doneButtonText: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     color: '#FFFFFF',
     textAlign: 'center',
   },

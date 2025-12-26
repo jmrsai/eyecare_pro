@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Home, User, Settings, Gamepad2 } from 'lucide-react-native';
+import { Home, User, Settings, Gamepad2, CheckCircle } from 'lucide-react-native';
 
 export default function TabLayout() {
   return (
@@ -9,6 +9,13 @@ export default function TabLayout() {
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <Home color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="checkup"
+        options={{
+          title: 'Check-up',
+          tabBarIcon: ({ color }) => <CheckCircle color={color} />,
         }}
       />
       <Tabs.Screen

@@ -436,7 +436,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 28,
-    fontWeight: 'bold',
+    fontWeight: 'bold' as const,
     color: '#FFFFFF',
     marginBottom: 4,
   },
@@ -492,7 +492,7 @@ const styles = StyleSheet.create({
   },
   exerciseName: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: 'bold' as const,
     color: '#1F2937',
     marginBottom: 4,
     textAlign: 'center',
@@ -508,7 +508,7 @@ const styles = StyleSheet.create({
   },
   timerText: {
     fontSize: 36,
-    fontWeight: 'bold',
+    fontWeight: 'bold' as const,
     color: '#8B5CF6',
   },
   animationCard: {
@@ -588,7 +588,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#5B21B6',
     textAlign: 'center',
-    fontWeight: '500',
+    fontWeight: '500' as const,
   },
   controlsContainer: {
     alignItems: 'center',
@@ -610,7 +610,7 @@ const styles = StyleSheet.create({
   },
   completeTitle: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: 'bold' as const,
     color: '#1F2937',
     marginTop: 20,
     marginBottom: 16,
@@ -632,7 +632,7 @@ const styles = StyleSheet.create({
   },
   doneButtonText: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '600' as const,
     color: '#FFFFFF',
     textAlign: 'center',
   },

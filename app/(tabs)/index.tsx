@@ -88,11 +88,11 @@ export default function TestsScreen() {
   };
 
   const handleEmergencyPress = () => {
-    router.push('/emergency');
+    router.push('/emergency' as any);
   };
 
   const handleSettingsPress = () => {
-    router.push('/settings');
+    router.push('/settings' as any);
   };
 
   const styles = StyleSheet.create({

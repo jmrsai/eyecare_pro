@@ -1,4 +1,28 @@
-export const GAMES = [
+export interface Game {
+  id: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  icon: string;
+  color: string;
+  difficulty: string;
+  duration: string;
+  skill: string;
+  route: string;
+}
+
+export interface Therapy {
+  id: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  icon: string;
+  color: string;
+  duration: string;
+  route: string;
+}
+
+export const GAMES: Game[] = [
   {
     id: 'jungle-explorer',
     title: 'Jungle Explorer',
@@ -49,7 +73,7 @@ export const GAMES = [
   },
 ];
 
-export const THERAPIES = [
+export const THERAPIES: Therapy[] = [
   {
     id: 'magic-eye-hug',
     title: 'Magic Eye Hug',
